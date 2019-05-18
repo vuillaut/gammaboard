@@ -133,6 +133,7 @@ class Experiment(object):
         self.loaded = False
         self.plotted = False
         self.color = None
+        self.mask = None
 
         self.cm = plt.cm.jet
         self.cm.set_under('w', 1)
@@ -141,6 +142,14 @@ class Experiment(object):
         self.data = load_data(self.name, self.experiments_directory)
         if self.data is not None:
             self.set_loaded(True)
+            self.init_mask()
+
+    def init_mask(self):
+        """
+        Re-initialize mask to select all data
+        """
+        if self.data is not None:
+            self.mask = np.ones(len(self.data), dtype=bool)
 
     def get_data(self):
         return self.data
@@ -159,11 +168,11 @@ class Experiment(object):
 
     def plot_angular_resolution(self, ax=None):
         if self.get_loaded():
-            self.ax_ang_res = ctaplot.plot_angular_res_per_energy(self.data.reco_altitude,
-                                                                  self.data.reco_azimuth,
-                                                                  self.data.mc_altitude,
-                                                                  self.data.mc_azimuth,
-                                                                  self.data.mc_energy,
+            self.ax_ang_res = ctaplot.plot_angular_res_per_energy(self.data[self.mask].reco_altitude,
+                                                                  self.data[self.mask].reco_azimuth,
+                                                                  self.data[self.mask].mc_altitude,
+                                                                  self.data[self.mask].mc_azimuth,
+                                                                  self.data[self.mask].mc_energy,
                                                                   ax=ax,
                                                                   label=self.name,
                                                                   color=self.color)
